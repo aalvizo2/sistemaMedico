@@ -1,0 +1,18 @@
+.content{
+    width: 89% !important;
+    height: 808px;
+    margin-left: 80px;
+    margin-top: 50px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 20px 111px;
+    /*border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;*/
+    
+}
+
+.content h1{
+    font-size: 20px;
+    
+}

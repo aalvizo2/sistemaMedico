@@ -1,0 +1,23 @@
+.sidebar{
+    position: absolute;
+    top: 150px;
+    width: 61px;
+    height: 808px;
+    background-color: var(--color-primario);
+    display: flex;
+    flex-direction: column;
+    padding: none;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.sidebar a{
+    color: #FFF;
+    margin-top: 20px;
+    transition: 0.3s ease;
+}
+
+.sidebar a:hover{
+    color: #fff;
+    translate: translateY(-5px);
+}

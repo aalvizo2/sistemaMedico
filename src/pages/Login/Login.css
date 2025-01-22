@@ -1,0 +1,129 @@
+.background{
+    width: 60%;
+    height: 100%;
+    background-color: #3B83BD;
+    border-top-right-radius: 100%;
+    
+}
+
+.container{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-box-shadow: 0px 2px 5px -3px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 2px 5px -3px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 2px 5px -3px rgba(0, 0, 0, 0.75);
+    width: 701px;
+    height: 517px;
+    background-color: #fff;
+
+}
+
+.container h1{
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    font-family: "Poppins", serif;
+    color: var(--color-primario);
+    padding-top: 25px;
+}
+
+.form{
+    width: 80%;
+    height: fit-content;
+    margin-left: 10%;
+    font-family: "Poppins", "serif";
+    margin-top: 25px;
+}
+
+.form .input-ant {
+    width: 100%;
+    border: none; /* Eliminar todas las líneas */
+    border-bottom: 5px solid var(--color-primario); /* Agregar solo línea inferior */
+    border-radius: 0; /* Asegurar que no tenga bordes redondeados */
+    box-shadow: none; /* Quitar cualquier sombra */
+    outline: none; /* Evitar borde azul al hacer clic */
+    background-color: transparent; /* Si necesitas fondo transparente */
+    padding: 0;
+    margin: 0;
+    height: fit-content;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px
+    
+    
+}
+
+.form .input-ant .ant-input-prefix{
+    color: var(--color-primario);
+    font-size: 30px;
+    margin: 0;
+    padding: 0;
+    margin-right: 15px;
+}
+
+.ant-form-item-label > label {
+    font-size: 16px; /* Ajustar el tamaño */
+    color: var(--color-primario); /* Cambiar color */
+    font-weight: bold; /* Opcional: negrita */
+    
+    margin-bottom: 5px; /* Espaciado */
+}
+
+.form .input label{
+    
+    border: 1px solid black;
+}
+
+.input-label span{
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--color-primario);
+    font-family: 'Poppins', 'serif';
+    
+}
+
+.submit-btn {
+    border: none; /* Elimina el borde gris */
+    border-radius: 0;
+    outline: none;
+    width: 232px;
+    height: 37px;
+    text-align: center;
+    background-color: var(--color-primario);
+    color: #fff;
+    font-size: 16px;
+    font-family: "Poppins", "serif";
+    box-shadow: none;
+    margin-bottom: 55px;
+}
+
+.submit-btn:hover,
+.submit-btn:focus {
+    border: none; /* Asegúrate de que no aparezca al interactuar */
+    box-shadow: none; /* Elimina sombras al enfocarse */
+    outline: none;
+    background-color: var(--color-primario);
+    color: #ccc; /* Sin contorno adicional */
+}
+
+.error-message{
+    color: #fd0202;
+    
+    margin: none;
+    font-weight: bold;
+    font-size: 16px;
+    position: absolute;
+    top: 300px;
+    
+}
+
+@media screen and (max-width: 1000px) {
+    .container{
+        
+        width: 80%;
+        height: fit-content;
+        
+    }
+}
