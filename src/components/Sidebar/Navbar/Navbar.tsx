@@ -10,13 +10,16 @@ interface LoginProps{
 const Navbar: React.FC<LoginProps> = ({onLogout}) => {
   // Estado para recuperar el usuario de la sesión
   const [usuario, setUsuario] = useState("");
+  const [role, setRole] = useState<string>("");
 
   // Estado para controlar la búsqueda
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   const getUser = () => {
     const username = localStorage.getItem("username");
+    const role= localStorage.getItem("rol");
     setUsuario(username || "");
+    setRole(role || "");
   };
 
   useEffect(() => {
@@ -37,7 +40,7 @@ const Navbar: React.FC<LoginProps> = ({onLogout}) => {
         {/* Datos del usuario */}
         <div className="user-data">
           <span>{usuario}</span>
-          Administrador
+          {role}
         </div>
 
         {/* Íconos */}

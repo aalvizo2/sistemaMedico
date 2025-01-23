@@ -1,5 +1,5 @@
 import React from "react";
-import {Modal,  Form, Input, Col, Row} from "antd";
+import {Modal,  Form, Input, Col, Row, DatePicker} from "antd";
 import {SaveOutlined} from "@ant-design/icons";
 
 interface AgregarModalProps {
@@ -63,7 +63,7 @@ export const AgregarModal: React.FC<AgregarModalProps>= ({open, onSubmit, onCanc
                             name="Birthday"
                             rules={[{ required: true, message: 'Por favor ingrese la fecha de nacimiento' }]}
                         >
-                            <Input />
+                            <DatePicker format="DD/MM/YYYY" />
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -72,7 +72,7 @@ export const AgregarModal: React.FC<AgregarModalProps>= ({open, onSubmit, onCanc
                             name="Age"
                             rules={[{ required: true, message: 'Por favor ingrese la edad' }]}
                         >
-                            <Input />
+                            <Input type="number" maxLength={5}/>
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -99,7 +99,7 @@ export const AgregarModal: React.FC<AgregarModalProps>= ({open, onSubmit, onCanc
                             name="ParticularPhone"
                             rules={[{ required: true, message: 'Por favor ingrese el teléfono particular' }]}
                         >
-                            <Input />
+                            <Input type="number" maxLength={10}/>
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -108,7 +108,7 @@ export const AgregarModal: React.FC<AgregarModalProps>= ({open, onSubmit, onCanc
                             name="CellPhone"
                             rules={[{ required: true, message: 'Por favor ingrese el celular' }]}
                         >
-                            <Input />
+                            <Input type="number" maxLength={10}/>
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -119,6 +119,11 @@ export const AgregarModal: React.FC<AgregarModalProps>= ({open, onSubmit, onCanc
                         >
                             <Input />
                         </Form.Item>
+                    </Col>
+                    <Col>
+                      <Form.Item name="State" initialValue={true}>
+                        <Input type="hidden" />
+                      </Form.Item>
                     </Col>
                 </Row>
 

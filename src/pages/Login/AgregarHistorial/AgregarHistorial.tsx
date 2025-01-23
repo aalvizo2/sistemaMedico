@@ -1,80 +1,38 @@
 
 import { Table, Tag, Button } from 'antd';
 import {PlusOutlined} from "@ant-design/icons";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AgregarModal } from './AgregarModal';
+import { PacientesRepositoryImpl } from '../../../domain/repositories/PacientesRepositoryImpl';
+import { PacientesUseCases } from '../../../core/useCases/PacientesUseCases';
+import { getUsers, newPaciente } from '../../../domain/entities/MedicalUsers';
 
-
+const pacientesRepository= new PacientesRepositoryImpl();
+const pacientesUseCases= new PacientesUseCases(pacientesRepository);
 
 const AgregarHistorial = () => {
     const [modal, setModal]= useState(false);
-    const [datos, setDatos]= useState([
-        {
-            Name: "Alan",
-            PaternalSurname: "Alvizo",
-            MaternalSurname: "Alvizo",
-            Birthday: "1999-09-09",
-            Age: 22,
-            BirthPlace: "Mexico",
-            Address: "Calle 123",
-            ParticularPhone: "1234567890",
-            CellPhone: "1234567890",
-            Ocupation: "Estudiante",
-            State: true
-        },
-        {
-            Name: "Carlos",
-            PaternalSurname: "Hernandez",
-            MaternalSurname: "Gomez",
-            Birthday: "1995-08-25",
-            Age: 30,
-            BirthPlace: "Monterrey",
-            Address: "Calle Ficticia 456",
-            ParticularPhone: "4567890123",
-            CellPhone: "6543210987",
-            Ocupation: "Ingeniero",
-            State: false
-        },
-        {
-            Name: "Lucia",
-            PaternalSurname: "Ramirez",
-            MaternalSurname: "Perez",
-            Birthday: "1990-12-05",
-            Age: 34,
-            BirthPlace: "Tijuana",
-            Address: "Blvd. 2000 #300",
-            ParticularPhone: "5678901234",
-            CellPhone: "7654321098",
-            Ocupation: "Doctora",
-            State: true
-        },
-        {
-            Name: "Juan",
-            PaternalSurname: "Garcia",
-            MaternalSurname: "Sanchez",
-            Birthday: "1988-02-20",
-            Age: 37,
-            BirthPlace: "Culiacán",
-            Address: "Calle 25 #50",
-            ParticularPhone: "6789012345",
-            CellPhone: "8765432109",
-            Ocupation: "Profesor",
-            State: false
-        },
-        {
-            Name: "Ana",
-            PaternalSurname: "Martinez",
-            MaternalSurname: "Lopez",
-            Birthday: "2000-11-11",
-            Age: 24,
-            BirthPlace: "Puebla",
-            Address: "Calle Reforma 789",
-            ParticularPhone: "7890123456",
-            CellPhone: "9876543210",
-            Ocupation: "Diseñadora",
-            State: true
+    const [datos, setDatos]= useState<getUsers[]>([]);
+    const [loading, setLoading] = useState(false);
+
+
+
+    const fetchData= async() => {
+        setLoading(true);
+        try{
+            const response= await pacientesUseCases.getPacientes();
+            setDatos(response);
+        }catch(error){
+            console.error("Error al cargar los datos", error);
+        }finally{
+            setLoading(false);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+    
 
     const columns= [
         {title: "Nombre", dataIndex: "Name", key: "Name"},
@@ -107,10 +65,17 @@ const AgregarHistorial = () => {
         setModal(false)
     };
 
-    const handleAdd= (newData: string)=> {
-        //@ts-expect-error
-         setDatos([...datos, newData]);
-    }
+    const handleAdd= async(newData: newPaciente)=> {
+    setLoading(true);
+        try{
+          await pacientesUseCases.newPaciente(newData);
+          fetchData();
+
+        }catch(error){
+           console.error("Error al agregar", error);
+        }
+        
+    };
     return (
         <div>
             <h1>Agregar Paciente</h1>
@@ -129,7 +94,7 @@ const AgregarHistorial = () => {
                     Agregar Nuevo
                 </Button>
              </div>
-            <Table dataSource={datos} columns={columns} className='table-responsive'/>
+            <Table dataSource={datos} columns={columns} className='table-responsive' loading={loading}/>
             <AgregarModal
                open={modal}
                onCancel={handleCloseModal}
