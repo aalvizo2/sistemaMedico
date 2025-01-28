@@ -17,3 +17,12 @@ html, body {
   height: 100%;
   --color-primario: #3B83BD;
 }
+
+
+.ant-btn-default{
+   border: 0;
+   box-shadow: none;
+
+
+}
+

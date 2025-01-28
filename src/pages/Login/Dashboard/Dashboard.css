@@ -1,30 +1,39 @@
 .image{
     width: 150px;
     height: 150px;
-    position: absolute;
-    top: 170px;
-    left: 65%;
+    display: flex;
 
 }
+.contenedor-general{
+    display: flex;
+    
+}
 
+.contenedor {
+    display: flex; /* Mantén Flexbox */
+    flex-direction: column; /* Asegúrate de que los hijos se apilen */
+    
+    height: fit-content;
+    width: 80%;
+}
 
-.form-container {
+.contenedor .form-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Divide en 4 columnas iguales */
+    grid-template-columns: repeat(3, 1fr); /* Divide en 4 columnas iguales */
     gap: 16px; /* Espaciado uniforme entre las columnas */
     margin-top: 20px;
     padding: 0;
     background-color: #fff; /* Fondo blanco como en la imagen */
 }
 
-.form-container .column {
+.contenedor .form-container .column {
     display: flex;
     justify-content: flex-start;
     color: #ccc;
     align-items: center; /* Asegura que los elementos estén alineados verticalmente */
 }
 
-.form-container .column span {
+.contenedor .form-container .column span {
     color: #000000;
     font-size: 16px;
     font-weight: bold;
@@ -64,18 +73,39 @@
     object-fit: cover;
 }
 
-.image{
-    width: 150px;
-    height: 150px;
-    display: flex; /* Usamos flexbox para evitar que la imagen afecte el tamaño de la fila */
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; 
-    
-}
+
 
 
 .headers{
     margin-top: 30px;
     
+}
+
+@media screen and (max-width: 1370px) {
+    .contenedor .form-container {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    
+    .image{
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* Pantallas pequeñas: 1 columna */
+@media screen and (max-width: 860px) {
+    .contenedor .form-container {
+        grid-template-columns: 1fr; /* 1 columna */
+    }
+
+    .image{
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media screen and(max-width: 500px) {
+    .contenedor .form-container .column{
+        flex-direction: column;
+    }
 }

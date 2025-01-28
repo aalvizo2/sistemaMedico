@@ -1,19 +1,22 @@
 
-import { Table, Tag, Button } from 'antd';
-import {PlusOutlined} from "@ant-design/icons";
+import { Table, Tag, Button, Popconfirm } from 'antd';
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import { useEffect, useState } from 'react';
-import { AgregarModal } from './AgregarModal';
-import { PacientesRepositoryImpl } from '../../../domain/repositories/PacientesRepositoryImpl';
-import { PacientesUseCases } from '../../../core/useCases/PacientesUseCases';
-import { getUsers, newPaciente } from '../../../domain/entities/MedicalUsers';
+import {EditarModal} from './EditarModal'
+
+import { PacientesRepositoryImpl } from '../../domain/repositories/PacientesRepositoryImpl';
+import { PacientesUseCases } from '../../core/useCases/PacientesUseCases';
+import { editPaciente, getUsers} from '../../domain/entities/MedicalUsers';
+import './Editar.css'
 
 const pacientesRepository= new PacientesRepositoryImpl();
 const pacientesUseCases= new PacientesUseCases(pacientesRepository);
 
-const AgregarHistorial = () => {
+const EditarPaciente = () => {
     const [modal, setModal]= useState(false);
     const [datos, setDatos]= useState<getUsers[]>([]);
     const [loading, setLoading] = useState(false);
+    const [datoFila, setDatoFila] = useState<string[] | null>(null);
 
 
 
@@ -54,21 +57,45 @@ const AgregarHistorial = () => {
                     {estatus ? "Activo" : "Inactivo"}
                 </Tag>
             )
+        },
+        {
+            title: "Acciones",
+            render: (record: any) => (
+                <div className="button">
+                     <Button type='default' onClick={()=> handleOpenModal(record)}>
+                         <EditOutlined /> Editar
+                      </Button>
+                      <Popconfirm
+                         title="¿Estás segúro de desactivar este registro?"
+                         okText="Sí"
+                         cancelText="No"
+                         onConfirm={() => handleDelete(record)}
+                      >
+                         <Button type='default' >
+                           <DeleteOutlined /> Desactivar
+                         </Button>
+                      </Popconfirm>
+                      
+                </div>
+                
+            )
         }
     ];
 
     //Creamos la funcion para abrir el modal y guardar datos
-    const handleOpenModal= () => {
+    const handleOpenModal= (record: any) => {
+        setDatoFila(record);
         setModal(true);
     };
     const handleCloseModal= () => {
         setModal(false)
     };
 
-    const handleAdd= async(newData: newPaciente)=> {
+    const handleAdd= async(newData: editPaciente)=> {
     setLoading(true);
         try{
-          await pacientesUseCases.newPaciente(newData);
+          const Id= newData.Id;
+          await pacientesUseCases.editPaciente(Id, newData);
           fetchData();
 
         }catch(error){
@@ -76,9 +103,13 @@ const AgregarHistorial = () => {
         }
         
     };
+    const handleDelete= async(record: any) => {
+        await pacientesUseCases.deletePaciente(record.Id);
+        fetchData();
+    }
     return (
         <div>
-            <h1>Agregar Paciente</h1>
+            <h1>Editar Paciente</h1>
              <div
                 style={{
                     display: "flex",
@@ -86,27 +117,21 @@ const AgregarHistorial = () => {
                     marginBottom: "10px"
                 }}
              >
-                <Button 
-                    type="primary" 
-                    icon={<PlusOutlined />}
-                    onClick={handleOpenModal}
-                >
-                    Agregar Nuevo
-                </Button>
+                
              </div>
             <Table 
                 dataSource={datos} 
                 columns={columns} 
-                className='table-responsive' 
                 loading={loading}
                 scroll={{ x: "max-content" }}
             />
-            <AgregarModal
+            <EditarModal
                open={modal}
                onCancel={handleCloseModal}
                onSubmit={handleAdd}
+               datoFila={datoFila}
             />
         </div>
     )
 }
-export default AgregarHistorial;
+export default EditarPaciente;

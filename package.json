@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
+  "dev": "concurrently \"npm run backend\" \"vite\"",
+  "backend": "nodemon backend/server.js",
+  "build": "tsc && vite build && electron-builder",
+  "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+  "preview": "electron-vite preview"
+},
   "dependencies": {
     "antd": "^5.23.1",
     "boostrap": "^2.0.0",

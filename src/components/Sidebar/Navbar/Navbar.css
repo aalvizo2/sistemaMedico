@@ -31,8 +31,7 @@
 }
 
 .search input {
-    width: 0;
-    opacity: 0;
+    
     border: none;
     border-bottom: 1px solid #ccc;
     transition: all 0.3s ease; /* Animación suave */
@@ -40,12 +39,12 @@
   
 .search input:focus {
     outline: none;
-    border-bottom: 1px solid #1890ff; /* Cambia el color al enfocarse */
+    /* Cambia el color al enfocarse */
 }
   
 .search input.show {
     width: 200px; /* Ancho final del input */
-    opacity: 1;
+    
 }
   
 .profile {

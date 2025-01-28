@@ -1,20 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {Modal,  Form, Input, Col, Row, DatePicker} from "antd";
 import {SaveOutlined} from "@ant-design/icons";
+import moment from "moment";
 
-interface AgregarModalProps {
+interface EditarModalProps {
     open: boolean;
     onSubmit: (values: any) => void;
     onCancel: () => void;
+    datoFila: { [key: string]: any } | null;
 }
-export const AgregarModal: React.FC<AgregarModalProps>= ({open, onSubmit, onCancel}) => {
+export const EditarModal: React.FC<EditarModalProps>= ({open, onSubmit, onCancel, datoFila}) => {
     const [form]= Form.useForm();
+
+    useEffect(() => {
+        if (datoFila) {
+            form.setFieldsValue({
+                ...datoFila,
+                Birthday: datoFila.Birthday ? moment(datoFila.Birthday) : null,
+            });
+            console.log(datoFila)
+        }
+    }, [datoFila, form, open]);
+    
 
     const handleSubmit = () => {
         form.validateFields().then(values => {
             form.resetFields();
             onSubmit({
                 ...values,
+                Id: datoFila?.Id
             });
             onCancel();
         });
