@@ -6,34 +6,44 @@ import {EditarModal} from './EditarModal'
 
 import { PacientesRepositoryImpl } from '../../domain/repositories/PacientesRepositoryImpl';
 import { PacientesUseCases } from '../../core/useCases/PacientesUseCases';
-import { editPaciente, getUsers} from '../../domain/entities/MedicalUsers';
+import { editPaciente} from '../../domain/entities/MedicalUsers';
 import './Editar.css'
+import { usePacienteContext } from '../../context/DashboardContext';
+import RedCrossSpinner from '../Login/Dashboard/RedCrossSpinner';
 
 const pacientesRepository= new PacientesRepositoryImpl();
 const pacientesUseCases= new PacientesUseCases(pacientesRepository);
 
 const EditarPaciente = () => {
     const [modal, setModal]= useState(false);
-    const [datos, setDatos]= useState<getUsers[]>([]);
-    const [loading, setLoading] = useState(false);
+    //const [datos, setDatos]= useState<getUsers[]>([]);
+    //const [loading, setLoading] = useState(false);
     const [datoFila, setDatoFila] = useState<string[] | null>(null);
+    const {
+        refreshPacientes,
+        pacientes,
+        loading
+    }= usePacienteContext()
 
 
 
-    const fetchData= async() => {
-        setLoading(true);
-        try{
-            const response= await pacientesUseCases.getPacientes();
-            setDatos(response);
-        }catch(error){
-            console.error("Error al cargar los datos", error);
-        }finally{
-            setLoading(false);
-        }
-    };
+    // const fetchData= async() => {
+    //     setLoading(true);
+    //     try{
+    //         const response= await pacientesUseCases.getPacientes();
+    //         setDatos(response);
+    //     }catch(error){
+    //         console.error("Error al cargar los datos", error);
+    //     }finally{
+    //         setLoading(false);
+    //     }
+    // };
 
+    // useEffect(() => {
+    //     fetchData();
+    // }, []);
     useEffect(() => {
-        fetchData();
+        refreshPacientes();
     }, []);
     
 
@@ -92,11 +102,11 @@ const EditarPaciente = () => {
     };
 
     const handleAdd= async(newData: editPaciente)=> {
-    setLoading(true);
+    
         try{
           const Id= newData.Id;
           await pacientesUseCases.editPaciente(Id, newData);
-          fetchData();
+          refreshPacientes();
 
         }catch(error){
            console.error("Error al agregar", error);
@@ -105,7 +115,7 @@ const EditarPaciente = () => {
     };
     const handleDelete= async(record: any) => {
         await pacientesUseCases.deletePaciente(record.Id);
-        fetchData();
+        refreshPacientes();
     }
     return (
         <div>
@@ -120,10 +130,17 @@ const EditarPaciente = () => {
                 
              </div>
             <Table 
-                dataSource={datos} 
+                //@ts-expect-error
+                dataSource={pacientes} 
                 columns={columns} 
-                loading={loading}
+                loading={{
+                    spinning: loading,
+                    indicator: <RedCrossSpinner />
+                }}
                 scroll={{ x: "max-content" }}
+                locale={{
+                    emptyText: loading ? '' : 'No hay datos'
+                }}
             />
             <EditarModal
                open={modal}

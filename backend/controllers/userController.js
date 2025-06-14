@@ -23,8 +23,13 @@ export const getAllUsers = async(req, res) => {
 export const createUser= async(req, res) => {
     try{
         const newData= req.body;
+         //hasheamos la contraseña
+    
+        //Declaramos que de los datos que se envien sean igual a la contraseña hasheada 
+        
         
         const newUser = new userModel(newData);
+        
         
         await newUser.save();
         res.status(200).send({Message: "Operación realizada con éxito"});
@@ -116,7 +121,13 @@ export const getAllDeletedUsers= async(req, res) => {
 export const getUserByName = async(req, res) => {
     const{Name}= req.params;
     console.log(Name)
-    const Data= await userModel.findById(Name);
+    const result= await userModel.findById(Name);
+    
+    const Data={
+        ...result.toObject(),
+        Id: result._id.toString(),
+        _id: undefined
+    }
     console.log(Data)
 
     res.status(200).json(Data)

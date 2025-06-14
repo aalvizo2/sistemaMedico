@@ -4,6 +4,8 @@ import { getAllDeletedUsers } from '../../domain/entities/MedicalUsers';
 import { PacientesRepositoryImpl } from '../../domain/repositories/PacientesRepositoryImpl';
 import { PacientesUseCases } from '../../core/useCases/PacientesUseCases';
 import { MdAutorenew } from 'react-icons/md';
+import { usePacienteContext } from '../../context/DashboardContext';
+import RedCrossSpinner from '../Login/Dashboard/RedCrossSpinner';
 
 
 const pacientesRepository= new PacientesRepositoryImpl();
@@ -14,10 +16,13 @@ const pacientesUseCases= new PacientesUseCases(pacientesRepository);
 const Papeleria: React.FC= () => {
     const [datos, setDatos]= useState<getAllDeletedUsers[]>([]);
     const [loading, setLoading] = useState(false);
+    const {refreshPacientes}= usePacienteContext();
 
     const fetchData= async() => {
         setLoading(true);
+        const timer= (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
         try{
+            await timer(1000);
            const response= await pacientesUseCases.getAllDeletedUsers();
            setDatos(response);
 
@@ -30,6 +35,7 @@ const Papeleria: React.FC= () => {
 
     useEffect(() => {
         fetchData();
+        refreshPacientes();
     }, []);
 
     const columns= [
@@ -78,6 +84,7 @@ const Papeleria: React.FC= () => {
         try{
             await pacientesUseCases.activateUser(record.Id);
             fetchData();
+            refreshPacientes();
         }catch(error){
             console.log('Error al cargar los datos', error)
         }
@@ -88,7 +95,13 @@ const Papeleria: React.FC= () => {
           <Table 
              dataSource={datos}
              columns={columns}
-             loading={loading}
+             loading={{
+                spinning: loading,
+                indicator: <RedCrossSpinner />
+             }}
+             locale={{
+                emptyText: loading? '' : 'No hay datos'
+             }}
              scroll={{ x: "max-content" }}
         />
         </>

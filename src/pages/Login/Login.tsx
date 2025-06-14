@@ -10,8 +10,9 @@ import { Authenticate } from '../../domain/entities/Auth';
 
 
 const{Password} = Input;
- const authRepository= new AuthRepositoryImpl();
- const authUseCases= new AuthUseCases(authRepository);
+
+const authRepository= new AuthRepositoryImpl();
+const authUseCases= new AuthUseCases(authRepository);
 
 
 interface LoginProps{

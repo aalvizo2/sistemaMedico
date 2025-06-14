@@ -3,13 +3,15 @@ import mongoose from 'mongoose';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
 import loginRoutes from './routes/loginRoutes.js'
+import consultaRoutes from './routes/consultaRoute.js';
+import bloodTypeRoutes from './routes/bloodTypeRoutes.js';
 
 
 const app = express();
 const PORT = 3000;
 
 //Configuramos cors
-const allowedOrigins = ['http://localhost:5174', 'http://127.0.0.1:5174'];
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -37,7 +39,9 @@ mongoose
 
 //Rutas
 app.use('/api/v1/Users', userRoutes);
-app.use('/api/v1/Auth', loginRoutes)
+app.use('/api/v1/Auth', loginRoutes);
+app.use('/api/v1/MedicalConsult', consultaRoutes);
+app.use('/api/v1/BloodType', bloodTypeRoutes);
 
 app.listen(PORT, () => {
     console.log(`app running on ${PORT}`);

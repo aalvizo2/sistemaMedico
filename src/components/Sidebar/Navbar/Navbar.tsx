@@ -3,14 +3,14 @@ import "./Navbar.css";
 import { SearchOutlined } from "@ant-design/icons";
 import { MdPerson } from "react-icons/md";
 import { Dropdown, Menu, Select } from "antd";
-import { getUsers } from "../../../domain/entities/MedicalUsers";
-import { PacientesRepositoryImpl } from "../../../domain/repositories/PacientesRepositoryImpl";
-import { PacientesUseCases } from "../../../core/useCases/PacientesUseCases";
+// import { getUsers } from "../../../domain/entities/MedicalUsers";
+// import { PacientesRepositoryImpl } from "../../../domain/repositories/PacientesRepositoryImpl";
+// import { PacientesUseCases } from "../../../core/useCases/PacientesUseCases";
 import { usePacienteContext } from "../../../context/DashboardContext";
 
 
-const pacientRepository = new PacientesRepositoryImpl();
-const pacientesUseCases = new PacientesUseCases(pacientRepository);
+// const pacientRepository = new PacientesRepositoryImpl();
+// const pacientesUseCases = new PacientesUseCases(pacientRepository);
 
 const {Option} = Select;
 
@@ -24,9 +24,9 @@ const Navbar: React.FC<LoginProps> = ({ onLogout }) => {
   const [role, setRole] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [usuarios, setUsuarios]= useState<getUsers[]>([]);
-
-  const {fetchPaciente}= usePacienteContext();
+  //const [usuarios, setUsuarios]= useState<getUsers[]>([]);
+  const {refreshPacientes}= usePacienteContext();
+  const {fetchPaciente, pacientes}= usePacienteContext();
 
   const getUser = () => {
     const username = localStorage.getItem("username");
@@ -47,19 +47,19 @@ const Navbar: React.FC<LoginProps> = ({ onLogout }) => {
 
   
 
-  const fetchUsers= async() => {
-    try{
-      const response= await pacientesUseCases.getPacientes();
-      setUsuarios(response);
+  // const fetchUsers= async() => {
+  //   try{
+  //     const response= await pacientesUseCases.getPacientes();
+  //     setUsuarios(response);
 
-    }catch(error){
-      console.error("Error al cargar los pacientes", error);
-    }
-  };
+  //   }catch(error){
+  //     console.error("Error al cargar los pacientes", error);
+  //   }
+  // };
 
   useEffect(() => {
     getUser();
-    fetchUsers();
+    refreshPacientes();
   }, [usuario]);
 
   const handleSearchChange= async(value: string) => {
@@ -100,7 +100,8 @@ const Navbar: React.FC<LoginProps> = ({ onLogout }) => {
                     : false
                 }
               >
-                {usuarios.map((item) => (
+                
+                {pacientes?.map((item) => (
                   <Option 
                      key={item.Id}
                      value={item.Id}
