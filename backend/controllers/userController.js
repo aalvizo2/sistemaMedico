@@ -1,4 +1,6 @@
 import userModel from "../models/userModel.js";
+import path from "path";
+
 
 
 export const getAllUsers = async(req, res) => {
@@ -20,23 +22,37 @@ export const getAllUsers = async(req, res) => {
     }
 }
 
-export const createUser= async(req, res) => {
-    try{
-        const newData= req.body;
-         //hasheamos la contraseña
-    
-        //Declaramos que de los datos que se envien sean igual a la contraseña hasheada 
-        
-        
+export const createUser = async (req, res) => {
+    try {
+        const newData = req.body;
+        let fileInfo = null;
+
+        // Verificar si se subió archivo
+        if (req.file) {
+            fileInfo = {
+                Path: `images/${req.file.filename}`, // archivo real guardado
+                Extension: path.extname(req.file.originalname).substring(1)
+            };
+            newData.Files = [fileInfo];
+        } else {
+            console.log("No se recibió archivo");
+        }
+
+        console.log("Datos del usuario:", newData);
+
         const newUser = new userModel(newData);
-        
-        
         await newUser.save();
-        res.status(200).send({Message: "Operación realizada con éxito"});
-    }catch(error){
-        res.status(500).send({Message: "Error al crear usuario", error})
+
+        res.status(200).send({ Message: "Operación realizada con éxito" });
+    } catch (error) {
+        console.error("Error en createUser:", error);
+        res.status(500).send({
+            Message: "Error al crear usuario",
+            error: error.message
+        });
     }
 };
+
 
 export const editUser = async (req, res) => {
     try {

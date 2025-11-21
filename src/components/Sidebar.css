@@ -2,13 +2,15 @@
     position: absolute;
     top: 150px;
     width: 61px;
-    height: 808px;
+    height: fit-content;
     background-color: var(--color-primario);
     display: flex;
     flex-direction: column;
     padding: none;
     align-items: center;
     border-radius: 5px;
+    padding-bottom: 25px;
+
 }
 
 .sidebar a{

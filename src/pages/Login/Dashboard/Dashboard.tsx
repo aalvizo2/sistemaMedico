@@ -12,6 +12,7 @@ import RedCrossSpinner from './RedCrossSpinner';
 
 
 
+
 const historialRepository = new HistorialMedicoRepositoryImpl();
 const historialUseCases = new HistorialClinicoUseCases(historialRepository);
 
@@ -46,6 +47,7 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
 
 
   console.log(paciente, "paciente recuperado")
@@ -162,7 +164,18 @@ const Dashboard: React.FC = () => {
           <div></div>
         ) : (
           <div className="image">
-            <img src={image} alt="imagen" />
+
+            <img
+              src={
+                //@ts-expect-error
+                paciente?.Files?.length
+                  //@ts-expect-error
+                  ? `http://localhost:3000/${paciente.Files[0].Path}`
+                  : image
+              }
+              alt="Paciente"
+            />
+
           </div>
         )}
 

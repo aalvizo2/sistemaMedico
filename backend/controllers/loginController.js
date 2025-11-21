@@ -11,12 +11,9 @@ export const loginUser = async (req, res) => {
         // Buscar al usuario por el nombre de usuario
         const user = await users.findOne({ Username });
 
-        // Si no existe el usuario
-        if (!user) {
-            return res.status(401).json({ Message: "Usuario no encontrado" });
+        if(user){
+            console.log("si existe el usuario", user)
         }
-
-        // Comparar la contraseña ingresada con la almacenada
         const isMatch = await bcrypt.compare(Password, user.Password);
 
         if (!isMatch) {
@@ -32,7 +29,7 @@ export const loginUser = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ Message: "Error en el servidor", error });
+        res.status(500).json({ Message: "Error en el servidor", error: error.message });
     }
 };
 

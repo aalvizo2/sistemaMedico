@@ -21,6 +21,10 @@
     
 }
 
+.user-data p{
+    font-size: 12px;
+}
+
 .icons{
     display: flex;
     color: #000;

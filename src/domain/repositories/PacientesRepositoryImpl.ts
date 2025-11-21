@@ -1,5 +1,5 @@
 import { PacientesApi } from "../../adapters/api/PacientesApi";
-import { editPaciente, getAllDeletedUsers, getUsers, newPaciente } from "../entities/MedicalUsers";
+import { certainUsers, editPaciente, getAllDeletedUsers, getUsers, newPaciente } from "../entities/MedicalUsers";
 
 
 
@@ -31,5 +31,9 @@ export class PacientesRepositoryImpl{
 
     async getUserById(Id: string):Promise<getUsers[]>{
         return PacientesApi.getUserById(Id)
+    }
+
+    async getCertainData(): Promise<certainUsers[]>{
+        return PacientesApi.getCertainInformation();
     }
 }

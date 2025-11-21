@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../../config/apiConfig";
-import { editPaciente, getAllDeletedUsers, getUsers, newPaciente } from "../../domain/entities/MedicalUsers";
+import { certainUsers, editPaciente, getAllDeletedUsers, getUsers, newPaciente } from "../../domain/entities/MedicalUsers";
 import createHttpClient from "./http/httpClient";
 import {message} from 'antd';
 
@@ -61,5 +61,21 @@ export const PacientesApi ={
     getUserById: async(userId: string): Promise<getUsers[]>=>{
         const response= await httpClient.get(`/api/v1/Users/userId/${userId}`);
         return response.data;
+    }, 
+
+    getCertainInformation: async(): Promise<certainUsers[]>=>{
+        const query=`
+           query{
+            Data {
+              Id,
+              Name,
+              PaternalSurname,
+              MaternalSurname
+            
+            }
+           }
+        `;
+        const response= await httpClient.post('', {query});
+        return response.data.Data;
     }
 }

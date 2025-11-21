@@ -17,6 +17,19 @@ const consultaSchema= new mongoose.Schema({
         type: String
     },
 
+    BloodType: {
+        type: String,
+    },
+
+    MedicalHistory:[
+        {
+            Date: {
+                type: String,
+            },
+
+        }
+    ]
+
 });
 
 export default mongoose.model("historiaClinica", consultaSchema);

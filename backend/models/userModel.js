@@ -45,7 +45,16 @@ const UserSchema = new mongoose.Schema({
     State: {
         type: Boolean,
         
-    }
+    },
+    BloodType: {
+        type: String
+    },
+    Files: [
+        {
+            Path: String,
+            Extension: String
+        }
+    ]
 
 });
 

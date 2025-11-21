@@ -22,6 +22,7 @@ const Login: React.FC<LoginProps> = ({onLogin}) => {
   const [form] = Form.useForm();
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [loading, setLoading]= useState(false);
+  
   const navigate= useNavigate();
   
   const handleSubmit = async(newData: Authenticate) => {
@@ -41,7 +42,7 @@ const Login: React.FC<LoginProps> = ({onLogin}) => {
         console.log(response);
 
        }catch(error: any){
-         console.error('Error al autenticar', error);
+         console.error('Error al autenticar', error.message);
          setErrorMessage(error.response.data.Message)
        }finally{
          setLoading(false)

@@ -11,6 +11,10 @@ export interface getUsers{
     CellPhone: string;
     Ocupation: string;
     State: boolean;
+    Files?: {
+        Path: string;
+        Extension: string;
+    }
 }
 
 export interface newPaciente{
@@ -24,6 +28,13 @@ export interface newPaciente{
     ParticularPhone: string;
     CellPhone: string;
     Ocupation: string;
+    BloodType: string;
+    RHFactor: string;
+    Files?: {
+        file: {
+            originFileObj: File;
+        };
+    };
     
 }
 
@@ -62,4 +73,11 @@ export interface getAllDeletedUsers{
 
 export interface activateUser{
     Id: string;
+}
+
+export interface certainUsers{
+    Id: string;
+    Name: string;
+    PaternalSurname: string;
+    MaternalSurname: string;
 }

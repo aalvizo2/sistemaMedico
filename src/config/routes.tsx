@@ -6,6 +6,10 @@ import Dashboard from "../pages/Login/Dashboard/Dashboard";
 import AgregarHistorial from "../pages/Login/AgregarHistorial/AgregarHistorial";
 import EditarPaciente from "../pages/EditarPaciente/Editar";
 import Papeleria from "../pages/PapeleriaReciclaje/Papeleria";
+import BloodType from "../pages/BloodType/BloodType";
+import Seguimiento from "../pages/Seguimiento/Seguimiento";
+import Notas from "../pages/Notas/Notas";
+import Perfil from "../pages/Perfil/Perfil";
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, login } = useAuth();
@@ -67,6 +71,45 @@ const AppRoutes: React.FC = () => {
             <Navigate to="/" />
           )
          } 
+      />
+      <Route 
+        path="tipo-sangre"
+        element={
+          isAuthenticated? (
+            <BloodType />
+          ): (
+            <Navigate to="/" />
+          )
+        }
+      
+      />
+
+      <Route 
+        path="seguimiento"
+        element={
+          isAuthenticated? (
+            <Seguimiento />
+          ): (
+            <Navigate to="/" />
+          )
+        }
+      
+      />
+      <Route 
+        path="notas"
+        element={
+          isAuthenticated? (
+            <Notas />
+          ): (
+            <Navigate to="/" />
+          )
+        }
+      
+      />
+
+      <Route 
+        path="perfil"
+        element={<Perfil />}
       />
     </Routes>
   );

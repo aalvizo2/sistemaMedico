@@ -15,7 +15,7 @@ const pacientesUseCases = new PacientesUseCases(pacientesRepository);
 const AgregarHistorial = () => {
     const [modal, setModal] = useState(false);
     //const [datos, setDatos] = useState<getUsers[]>([]);
-    const {pacientes, refreshPacientes, loading}= usePacienteContext();
+    const { pacientes, refreshPacientes, loading } = usePacienteContext();
     //const [loading, setLoading] = useState(false);
 
 
@@ -73,18 +73,30 @@ const AgregarHistorial = () => {
     const handleCloseModal = () => {
         setModal(false)
     };
+const handleAdd = async (newData: newPaciente) => {
+  try {
+    const formData = new FormData();
 
-    const handleAdd = async (newData: newPaciente) => {
-        //setLoading(true);
-        try {
-            await pacientesUseCases.newPaciente(newData);
-            refreshPacientes();
+    for (const key in newData) {
+      //@ts-expect-error
+      if (key === "Files" && newData.Files?.length > 0) {
+        //@ts-expect-error
+        formData.append("photo", newData.Files[0].originFileObj);
+      } else {
+        //@ts-expect-error
+        formData.append(key, newData[key]);
+      }
+    }
+    //@ts-expect-error
+    await pacientesUseCases.newPaciente(formData);
+    refreshPacientes();
+  } catch (error) {
+    console.error("Error al agregar", error);
+    setModal(false);
+  }
+};
 
-        } catch (error) {
-            console.error("Error al agregar", error);
-        }
 
-    };
     return (
         <div>
             <h1>Agregar Paciente</h1>
@@ -104,22 +116,22 @@ const AgregarHistorial = () => {
                 </Button>
             </div>
             <div style={{ minHeight: 300, position: 'relative' }}>
-               <Table
-                //@ts-expect-error
-                dataSource={pacientes}
-                columns={columns}
-                className='table-responsive'
-                loading={{
-                    spinning: loading,
-                    indicator: <RedCrossSpinner />
-                }}
-                scroll={{ x: "max-content" }}
-                locale={{
-                    emptyText: loading ? '' : 'No hay datos'
-                }}
-            />
+                <Table
+                    //@ts-expect-error
+                    dataSource={pacientes}
+                    columns={columns}
+                    className='table-responsive'
+                    loading={{
+                        spinning: loading,
+                        indicator: <RedCrossSpinner />
+                    }}
+                    scroll={{ x: "max-content" }}
+                    locale={{
+                        emptyText: loading ? '' : 'No hay datos'
+                    }}
+                />
             </div>
-            
+
             <AgregarModal
                 open={modal}
                 onCancel={handleCloseModal}

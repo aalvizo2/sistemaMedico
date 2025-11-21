@@ -1,4 +1,4 @@
-import { editPaciente, getAllDeletedUsers, getUsers, newPaciente } from "../../domain/entities/MedicalUsers";
+import { certainUsers, editPaciente, getAllDeletedUsers, getUsers, newPaciente } from "../../domain/entities/MedicalUsers";
 import { PacientesRepositoryImpl } from "../../domain/repositories/PacientesRepositoryImpl";
 
 
@@ -35,5 +35,9 @@ export class PacientesUseCases{
 
     async getUserById(Id: string): Promise<getUsers[]>{
         return this.pacientesRepository.getUserById(Id);
+    }
+
+    async getCertainInfo(): Promise<certainUsers[]>{
+        return this.pacientesRepository.getCertainData();
     }
 }

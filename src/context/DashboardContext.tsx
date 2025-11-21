@@ -31,7 +31,7 @@ export const PacienteProvider: React.FC<{ children: ReactNode }> = ({
 
   const fetchPaciente = async (id: string) => {
     setLoading(true);
-    const delay= (ms: number) => new Promise(resolve=> setTimeout(resolve, ms))
+    const delay= (ms: number) => new Promise(resolve=> setTimeout(resolve, ms));
     try {
       await delay(3000)
       const result = await pacientesUseCases.getUserById(id);
