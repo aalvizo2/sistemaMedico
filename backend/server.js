@@ -54,7 +54,7 @@ app.use('/api/v1/BloodType', bloodTypeRoutes);
 app.use('/api/v1/Seguimiento', seguimientoRoutes);
 
 //Usamos graphql
-app.use('/graphql', graphqlHTTP({
+app.use('/graphql', cors(), graphqlHTTP({
   graphiql: true,
   schema: schema
 }));

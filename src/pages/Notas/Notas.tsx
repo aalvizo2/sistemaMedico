@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -21,79 +21,88 @@ import {
 import { motion } from "framer-motion";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import { NotesRepositoryImpl } from "../../domain/repositories/NotesRepositoryImpl";
+import { NotesUseCases } from "../../core/useCases/NotesUseCases";
+import { getNotes, newEditNote } from "../../domain/entities/Notes";
 
 dayjs.locale("es");
 
 const { Option } = Select;
 
-interface NotaMedica {
-  id: string;
-  paciente: string;
-  fecha: string;
-  medico: string;
-  tipoNota: string;
-  descripcion: string;
-}
 
+
+
+const notesRepository = new NotesRepositoryImpl();
+const notesUseCases = new NotesUseCases(notesRepository);
 const Notas: React.FC = () => {
-  const [data, setData] = useState<NotaMedica[]>([
-    {
-      id: "1",
-      paciente: "Juan Pérez",
-      fecha: "2025-10-20",
-      medico: "Dra. María Gómez",
-      tipoNota: "Evolución",
-      descripcion: "Paciente presenta mejoría, sin fiebre. Se mantiene tratamiento actual.",
-    },
-    {
-      id: "2",
-      paciente: "Ana Rodríguez",
-      fecha: "2025-10-25",
-      medico: "Dr. Luis Herrera",
-      tipoNota: "Ingreso",
-      descripcion: "Ingreso por dolor abdominal. Se ordenan análisis de laboratorio.",
-    },
-  ]);
+  const [data, setData] = useState<getNotes[]>([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<NotaMedica | null>(null);
+  const [editingRecord, setEditingRecord] = useState<newEditNote | null>(null);
   const [form] = Form.useForm();
 
-  const showModal = (record?: NotaMedica) => {
+
+  //Mostrar 
+  const fetchData = async () => {
+    try {
+
+      const response = await notesUseCases.getNotes();
+      setData(response);
+      console.log('datos recuperados del backend', response)
+
+    } catch (error) {
+      console.error('Error al obtener los datos', error)
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const showModal = (record?: newEditNote) => {
     if (record) {
       setEditingRecord(record);
       form.setFieldsValue({
         ...record,
-        fecha: dayjs(record.fecha),
+        Date: dayjs(record.Date),
       });
+      console.log(record, 'datos que se van a grabar')
     } else {
       setEditingRecord(null);
       form.resetFields();
     }
     setIsModalVisible(true);
   };
-
-  const handleOk = () => {
-    form.validateFields().then((values) => {
-      const newData = {
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const formattedData = {
         ...values,
-        fecha: values.fecha.format("YYYY-MM-DD"),
+        Date: values.Date.format("YYYY-MM-DD"),
       };
 
+
       if (editingRecord) {
-        setData((prev) =>
-          prev.map((item) =>
-            item.id === editingRecord.id ? { ...item, ...newData } : item
-          )
-        );
-        message.success("Nota médica actualizada correctamente");
+        // Editar nota existente
+        await notesUseCases.editNote(formattedData);
+        fetchData();
       } else {
-        setData((prev) => [...prev, { id: Date.now().toString(), ...newData }]);
-        message.success("Nota médica agregada correctamente");
+        // Agregar nueva nota
+        console.log('datos antes de enviar', formattedData)
+        await notesUseCases.newNote(formattedData);
+        fetchData();
       }
+      
+      fetchData(); // refrescar los datos desde la API
       setIsModalVisible(false);
-    });
+
+
+    } catch (error) {
+      console.error("Error al guardar la nota", error);
+      message.error("Ocurrió un error al guardar la nota");
+    }
   };
+
+
 
   const handleDelete = (id: string) => {
     setData((prev) => prev.filter((item) => item.id !== id));
@@ -103,26 +112,26 @@ const Notas: React.FC = () => {
   const columns = [
     {
       title: "Paciente",
-      dataIndex: "paciente",
+      dataIndex: "Patient",
       key: "paciente",
       align: "center" as const,
     },
     {
       title: "Fecha",
-      dataIndex: "fecha",
+      dataIndex: "Date",
       key: "fecha",
       align: "center" as const,
       render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
     },
     {
       title: "Médico",
-      dataIndex: "medico",
+      dataIndex: "Doctor",
       key: "medico",
       align: "center" as const,
     },
     {
       title: "Tipo de Nota",
-      dataIndex: "tipoNota",
+      dataIndex: "NoteType",
       key: "tipoNota",
       align: "center" as const,
     },
@@ -130,7 +139,7 @@ const Notas: React.FC = () => {
       title: "Acciones",
       key: "acciones",
       align: "center" as const,
-      render: (_: any, record: NotaMedica) => (
+      render: (_: any, record: newEditNote) => (
         <Space>
           <Button
             icon={<EditOutlined />}
@@ -214,7 +223,7 @@ const Notas: React.FC = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             label="Paciente"
-            name="paciente"
+            name="Patient"
             rules={[{ required: true, message: "Por favor ingresa el nombre del paciente" }]}
           >
             <Input placeholder="Ej. Juan Pérez" />
@@ -222,7 +231,7 @@ const Notas: React.FC = () => {
 
           <Form.Item
             label="Fecha de la Nota"
-            name="fecha"
+            name="Date"
             rules={[{ required: true, message: "Selecciona la fecha" }]}
           >
             <DatePicker style={{ width: "100%" }} />
@@ -230,7 +239,7 @@ const Notas: React.FC = () => {
 
           <Form.Item
             label="Médico / Profesional"
-            name="medico"
+            name="Doctor"
             rules={[{ required: true, message: "Por favor ingresa el nombre del médico" }]}
           >
             <Input placeholder="Ej. Dra. Ana Torres" />
@@ -238,7 +247,7 @@ const Notas: React.FC = () => {
 
           <Form.Item
             label="Tipo de Nota"
-            name="tipoNota"
+            name="NoteType"
             rules={[{ required: true, message: "Selecciona el tipo de nota" }]}
           >
             <Select placeholder="Selecciona un tipo">
@@ -252,7 +261,7 @@ const Notas: React.FC = () => {
 
           <Form.Item
             label="Contenido / Descripción"
-            name="descripcion"
+            name="Description"
             rules={[{ required: true, message: "Por favor ingresa la descripción" }]}
           >
             <Input.TextArea rows={4} placeholder="Describe las observaciones médicas o indicaciones" />

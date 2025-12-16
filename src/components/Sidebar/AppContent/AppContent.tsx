@@ -30,9 +30,10 @@ const AppContent: React.FC = () => {
       <div style={{ flexShrink: 0, width: "100%" }}>
         <Navbar onLogout={logout} />
       </div>
+      <div className="top"></div>
 
       {/* Sidebar + Contenido */}
-      <div style={{ display: "flex", overflow: "hidden" }}>
+      <div style={{ display: "flex",  }}>
         <div>
           <Sidebar />
         </div>
