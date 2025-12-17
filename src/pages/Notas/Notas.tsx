@@ -24,19 +24,24 @@ import "dayjs/locale/es";
 import { NotesRepositoryImpl } from "../../domain/repositories/NotesRepositoryImpl";
 import { NotesUseCases } from "../../core/useCases/NotesUseCases";
 import { getNotes, newEditNote } from "../../domain/entities/Notes";
+import { PacientesRepositoryImpl } from "../../domain/repositories/PacientesRepositoryImpl";
+import { PacientesUseCases } from "../../core/useCases/PacientesUseCases";
+import { getUsers } from "../../domain/entities/MedicalUsers";
 
 dayjs.locale("es");
 
 const { Option } = Select;
 
 
-
+//Importamos la API de pacientes 
+const pacientesRepository = new PacientesRepositoryImpl();
+const pacientesUseCases = new PacientesUseCases(pacientesRepository);
 
 const notesRepository = new NotesRepositoryImpl();
 const notesUseCases = new NotesUseCases(notesRepository);
 const Notas: React.FC = () => {
   const [data, setData] = useState<getNotes[]>([]);
-
+  const [pacientes, setPacientes] = useState<getUsers[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState<newEditNote | null>(null);
   const [form] = Form.useForm();
@@ -55,8 +60,20 @@ const Notas: React.FC = () => {
     }
   };
 
+  //Mostramos los pacientes
+  const fetchPacientes = async () => {
+    try {
+
+      const response = await pacientesUseCases.getPacientes();
+      setPacientes(response);
+    } catch (error) {
+      console.error('Error al cargar los pacientes', error);
+    }
+  }
+
   useEffect(() => {
     fetchData();
+    fetchPacientes();
   }, []);
   const showModal = (record?: newEditNote) => {
     if (record) {
@@ -83,7 +100,13 @@ const Notas: React.FC = () => {
 
       if (editingRecord) {
         // Editar nota existente
-        await notesUseCases.editNote(formattedData);
+        console.log('datos antes de enviar', editingRecord);
+        const editingValues={
+           ...values,
+           id: editingRecord.id
+        }
+        console.log('datos que se supone que tengo que enviar', editingValues)
+        await notesUseCases.editNote(editingValues);
         fetchData();
       } else {
         // Agregar nueva nota
@@ -91,7 +114,7 @@ const Notas: React.FC = () => {
         await notesUseCases.newNote(formattedData);
         fetchData();
       }
-      
+
       fetchData(); // refrescar los datos desde la API
       setIsModalVisible(false);
 
@@ -104,9 +127,13 @@ const Notas: React.FC = () => {
 
 
 
-  const handleDelete = (id: string) => {
-    setData((prev) => prev.filter((item) => item.id !== id));
-    message.success("Nota médica eliminada");
+  const handleDelete = async(id: string) => {
+    try{
+       await notesUseCases.deleteNote(id);
+       fetchData();
+    }catch(error){
+      console.error("Error al eliminar la nota", error);
+    }
   };
 
   const columns = [
@@ -223,10 +250,23 @@ const Notas: React.FC = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             label="Paciente"
-            name="Patient"
+            name="PatientId"
             rules={[{ required: true, message: "Por favor ingresa el nombre del paciente" }]}
           >
-            <Input placeholder="Ej. Juan Pérez" />
+            <Select
+              placeholder="Selecciona un paciente"
+              filterOption
+            >
+              {pacientes.map((item) => (
+                <Option
+                  key={item.Id}
+                  value={item.Id} 
+                >
+                  {item.Name} {item.PaternalSurname} {item.MaternalSurname}
+                </Option>
+              ))}
+            </Select>
+
           </Form.Item>
 
           <Form.Item

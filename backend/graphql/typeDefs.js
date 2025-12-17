@@ -5,6 +5,7 @@ export const typeDefs= `
    type Note {
     id: ID!
     Patient: String!
+    PatientId: String!
     Date: String!
     Doctor: String
     NoteType: String!
@@ -12,7 +13,7 @@ export const typeDefs= `
   }
 
   input NoteInput {
-    Patient: String!
+    PatientId: String!
     Date: String!
     Doctor: String
     NoteType: String!

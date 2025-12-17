@@ -1,6 +1,6 @@
 import createHttpClient from "./http/httpClient";
 import { GRAPHQL_ROUTE } from "../../config/apiConfig";
-import { getNotes, newEditNote } from "../../domain/entities/Notes";
+import { deleteNote, getNotes, newEditNote } from "../../domain/entities/Notes";
 import { message } from "antd";
 
 
@@ -15,6 +15,7 @@ export const NotesApi = {
           getNotes{
             id
             Patient
+            PatientId
             Date
             Doctor
             NoteType
@@ -31,15 +32,15 @@ export const NotesApi = {
         mutation($input: NoteInput!) {
           createNote(input: $input) {
             
-            Patient
+            PatientId
             Date
             Doctor
             NoteType
-           Description
+            Description
          }
         }
       `;
-      const variables = {input: newData };
+      const variables = { input: newData };
       const response = await httpClient.post("", { query: mutation, variables });
       if (response) {
          message.success('Operación realizada con éxito');
@@ -51,10 +52,10 @@ export const NotesApi = {
 
    editNote: async (newData: newEditNote): Promise<newEditNote> => {
       const mutation = `
-        mutation(id: ID!, input: NoteInput!){
+        mutation($id: ID!, $input: NoteInput!){
            updateNote(id: $id, input: $input){
               id
-              Patient
+              PatientId
               Date
               Doctor
               NoteType
@@ -67,9 +68,40 @@ export const NotesApi = {
        `;
       const variables = {
          id: newData.id,
-         input: newData
+         input: {
+            PatientId: newData.PatientId,
+            Date: newData.Date,
+            Doctor: newData.Doctor,
+            NoteType: newData.NoteType,
+            Description: newData.Description,
+         }
       };
+
+      console.log('variables antes de enviar', variables)
       const response = await httpClient.post("", { query: mutation, variables });
       return response.data.data.updateNote;
-   }
-};
+   },
+   deleteNote: async (id: string): Promise<deleteNote> => {
+  const mutation = `
+    mutation($id: ID!) {
+      deleteNote(id: $id)
+    }
+  `;
+
+  const variables = { id };
+
+  console.log('DELETE variables', variables);
+
+  const response = await httpClient.post("", {
+    query: mutation,
+    variables,
+  });
+
+  if (response) {
+    message.success('Nota eliminada correctamente');
+  }
+
+  return response.data.data.deleteNote;
+}
+
+};                  

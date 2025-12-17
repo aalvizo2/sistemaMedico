@@ -1,4 +1,4 @@
-import { getNotes, newEditNote } from "../../domain/entities/Notes";
+import { deleteNote, getNotes, newEditNote } from "../../domain/entities/Notes";
 import { NotesRepositoryImpl } from "../../domain/repositories/NotesRepositoryImpl";
 
 
@@ -17,5 +17,9 @@ export class NotesUseCases{
 
     async editNote(newData: newEditNote): Promise<newEditNote>{
         return this.notesRepository.editNote(newData)
+    }
+
+    async deleteNote(id: string): Promise<deleteNote>{
+        return this.notesRepository.deleteNote(id);
     }
 }
