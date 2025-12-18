@@ -22,4 +22,8 @@ export class NotesUseCases{
     async deleteNote(id: string): Promise<deleteNote>{
         return this.notesRepository.deleteNote(id);
     }
+
+    async getNotesByPatient(patientId: string): Promise<getNotes[]>{
+        return this.notesRepository.getNotesByPatient(patientId);
+    }
 }

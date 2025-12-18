@@ -9,8 +9,8 @@ const httpClient = createHttpClient(GRAPHQL_ROUTE);
 
 export const NotesApi = {
 
-   getNotes: async (): Promise<getNotes[]> => {
-      const query = `
+  getNotes: async (): Promise<getNotes[]> => {
+    const query = `
         query{
           getNotes{
             id
@@ -23,12 +23,12 @@ export const NotesApi = {
           }
         }`;
 
-      const response = await httpClient.post("", { query });
-      return response.data.data.getNotes;
-   },
+    const response = await httpClient.post("", { query });
+    return response.data.data.getNotes;
+  },
 
-   newNote: async (newData: newEditNote): Promise<newEditNote> => {
-      const mutation = `
+  newNote: async (newData: newEditNote): Promise<newEditNote> => {
+    const mutation = `
         mutation($input: NoteInput!) {
           createNote(input: $input) {
             
@@ -40,18 +40,18 @@ export const NotesApi = {
          }
         }
       `;
-      const variables = { input: newData };
-      const response = await httpClient.post("", { query: mutation, variables });
-      if (response) {
-         message.success('Operación realizada con éxito');
-      }
-      return response.data.data.createNote;
+    const variables = { input: newData };
+    const response = await httpClient.post("", { query: mutation, variables });
+    if (response) {
+      message.success('Operación realizada con éxito');
+    }
+    return response.data.data.createNote;
 
-   },
+  },
 
 
-   editNote: async (newData: newEditNote): Promise<newEditNote> => {
-      const mutation = `
+  editNote: async (newData: newEditNote): Promise<newEditNote> => {
+    const mutation = `
         mutation($id: ID!, $input: NoteInput!){
            updateNote(id: $id, input: $input){
               id
@@ -66,42 +66,62 @@ export const NotesApi = {
         }
        
        `;
-      const variables = {
-         id: newData.id,
-         input: {
-            PatientId: newData.PatientId,
-            Date: newData.Date,
-            Doctor: newData.Doctor,
-            NoteType: newData.NoteType,
-            Description: newData.Description,
-         }
-      };
+    const variables = {
+      id: newData.id,
+      input: {
+        PatientId: newData.PatientId,
+        Date: newData.Date,
+        Doctor: newData.Doctor,
+        NoteType: newData.NoteType,
+        Description: newData.Description,
+      }
+    };
 
-      console.log('variables antes de enviar', variables)
-      const response = await httpClient.post("", { query: mutation, variables });
-      return response.data.data.updateNote;
-   },
-   deleteNote: async (id: string): Promise<deleteNote> => {
-  const mutation = `
+    console.log('variables antes de enviar', variables)
+    const response = await httpClient.post("", { query: mutation, variables });
+    return response.data.data.updateNote;
+  },
+  deleteNote: async (id: string): Promise<deleteNote> => {
+    const mutation = `
     mutation($id: ID!) {
       deleteNote(id: $id)
     }
   `;
 
-  const variables = { id };
+    const variables = { id };
 
-  console.log('DELETE variables', variables);
+    console.log('DELETE variables', variables);
 
-  const response = await httpClient.post("", {
-    query: mutation,
-    variables,
-  });
+    const response = await httpClient.post("", {
+      query: mutation,
+      variables,
+    });
 
-  if (response) {
-    message.success('Nota eliminada correctamente');
-  }
+    if (response) {
+      message.success('Nota eliminada correctamente');
+    }
 
-  return response.data.data.deleteNote;
-}
+    return response.data.data.deleteNote;
+  },
+getNotesByPatient: async (patientId: string): Promise<getNotes[]> => {
+  const query = `
+    query ($patientId: ID!) {
+      getNotesByPatient(patientId: $patientId) {
+        id
+        Patient
+        PatientId
+        Date
+        Doctor
+        NoteType
+        Description
+      }
+    }
+  `;
 
-};                  
+  const variables = { patientId };
+  const response = await httpClient.post("", { query, variables });
+  return response.data.data.getNotesByPatient;
+},
+
+
+};

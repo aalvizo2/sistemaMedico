@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 import image from '../../../../public/images/image.webp';
 // import { Select } from 'antd';
@@ -10,7 +10,12 @@ import moment from 'moment';
 //import MultiCircleSpinner from './MultiCircleSpinner';
 import RedCrossSpinner from './RedCrossSpinner';
 
+import { NotesRepositoryImpl } from '../../../domain/repositories/NotesRepositoryImpl';
+import { NotesUseCases } from '../../../core/useCases/NotesUseCases';
+import { getNotes } from '../../../domain/entities/Notes';
 
+const notesRepository= new NotesRepositoryImpl();
+const notesUseCases= new NotesUseCases(notesRepository);
 
 
 // const historialRepository = new HistorialMedicoRepositoryImpl();
@@ -44,24 +49,25 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const notas = [
-    {
-      id: "1",
-      paciente: "Juan Pérez",
-      fecha: "2025-10-20",
-      medico: "Dra. María Gómez",
-      tipoNota: "Evolución",
-      descripcion: "Paciente presenta mejoría, sin fiebre. Se mantiene tratamiento actual.",
-    },
-    {
-      id: "2",
-      paciente: "Ana Rodríguez",
-      fecha: "2025-10-25",
-      medico: "Dr. Luis Herrera",
-      tipoNota: "Ingreso",
-      descripcion: "Ingreso por dolor abdominal. Se ordenan análisis de laboratorio.",
-    },
-  ]
+  // const notas = [
+  //   {
+  //     id: "1",
+  //     paciente: "Juan Pérez",
+  //     fecha: "2025-10-20",
+  //     medico: "Dra. María Gómez",
+  //     tipoNota: "Evolución",
+  //     descripcion: "Paciente presenta mejoría, sin fiebre. Se mantiene tratamiento actual.",
+  //   },
+  //   {
+  //     id: "2",
+  //     paciente: "Ana Rodríguez",
+  //     fecha: "2025-10-25",
+  //     medico: "Dr. Luis Herrera",
+  //     tipoNota: "Ingreso",
+  //     descripcion: "Ingreso por dolor abdominal. Se ordenan análisis de laboratorio.",
+  //   },
+  // ]
+  const [notas, setNotas] = useState<getNotes[]>([]);
 
   const formatPhoneNumber = (phone: string): string => {
     if (!phone) return '';
@@ -91,7 +97,22 @@ const Dashboard: React.FC = () => {
 
 
 
-  console.log(paciente, "paciente recuperado")
+  const fetchNotes= async(patientId: string)=>{
+    try{
+      const response= await notesUseCases.getNotesByPatient(patientId);
+      console.log('notas obtenidas', response);
+      setNotas(response);
+    }catch(error){
+      console.error("Error al obtener las notas", error);
+
+    }
+  };
+
+  useEffect(()=>{
+    if(paciente){
+      fetchNotes(paciente.Id);
+    }
+  },[paciente])
   return (
     <>
 
@@ -206,10 +227,10 @@ const Dashboard: React.FC = () => {
                       <div className="grid-3">
                         {notas.map(item => (
                           <div key={item.id} className="item">
-                            <div><span>Fecha:</span> {item.fecha}</div>
-                            <div><span>Tipo:</span> {item.tipoNota}</div>
-                            <div><span>Médico:</span> {item.medico}</div>
-                            <div><span>Descripción:</span>{item.descripcion} </div>
+                            <div><span>Fecha:</span> {item.Date}</div>
+                            <div><span>Tipo:</span> {item.NoteType}</div>
+                            <div><span>Médico:</span> {item.Doctor}</div>
+                            <div><span>Descripción:</span>{item.Description} </div>
                             <button className="btn-editar">Editar</button>
                           </div>
                         ))}

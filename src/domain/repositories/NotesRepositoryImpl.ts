@@ -19,4 +19,8 @@ export class NotesRepositoryImpl{
     async deleteNote(id: string): Promise<deleteNote>{
         return NotesApi.deleteNote(id);
     }
+
+    async getNotesByPatient(patientId: string): Promise<getNotes[]>{
+        return NotesApi.getNotesByPatient(patientId);
+    }
 }

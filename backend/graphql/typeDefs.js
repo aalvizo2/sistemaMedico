@@ -23,6 +23,7 @@ export const typeDefs= `
   type Query {
     getNotes: [Note!]!
     getNote(id: ID!): Note
+    getNotesByPatient(patientId: ID!): [Note!]!
   }
 
   type Mutation {

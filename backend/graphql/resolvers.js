@@ -9,6 +9,10 @@ export const resolvers = {
     getNote: async (_, { id }) => {
       return await Note.findById(id);
     },
+    getNotesByPatient: async (_, { patientId }) => {
+      return await Note.find({ PatientId: patientId });
+    },
+
   },
   Mutation: {
     createNote: async (_, { input }) => {
@@ -29,22 +33,22 @@ export const resolvers = {
       return await newNote.save();
     },
     updateNote: async (_, { id, input }) => {
-  const usuario = await userModel.findById(input.PatientId);
-  if (!usuario) {
-    throw new Error("Paciente no encontrado");
-  }
+      const usuario = await userModel.findById(input.PatientId);
+      if (!usuario) {
+        throw new Error("Paciente no encontrado");
+      }
 
-  const newData = {
-    ...input,
-    Date: typeof input.Date === "string"
-      ? input.Date
-      : new Date(input.Date).toISOString(), // 👈 CLAVE
-    Patient: `${usuario.Name} ${usuario.PaternalSurname} ${usuario.MaternalSurname}`,
-    PatientId: usuario._id
-  };
+      const newData = {
+        ...input,
+        Date: typeof input.Date === "string"
+          ? input.Date
+          : new Date(input.Date).toISOString(), // 👈 CLAVE
+        Patient: `${usuario.Name} ${usuario.PaternalSurname} ${usuario.MaternalSurname}`,
+        PatientId: usuario._id
+      };
 
-  return await Note.findByIdAndUpdate(id, newData, { new: true });
-},
+      return await Note.findByIdAndUpdate(id, newData, { new: true });
+    },
 
 
     deleteNote: async (_, { id }) => {
