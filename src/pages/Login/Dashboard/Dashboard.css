@@ -219,6 +219,7 @@
 /* SECCIONES */
 .section {
   margin-bottom: 25px;
+  
 }
 
 .section-title {
@@ -233,7 +234,8 @@
 /* GRID */
 .grid-3 {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  width: 350px;
+  grid-template-columns: repeat(6, 1fr);
   gap: 15px;
 }
 
@@ -243,6 +245,7 @@
   padding: 12px;
   border-radius: 10px;
   border: 1px solid #e1e1e1;
+  
 }
 
 .item span {
