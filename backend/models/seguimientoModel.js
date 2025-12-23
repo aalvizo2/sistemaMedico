@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 
 const SeguimientoSchema= new mongoose.Schema({
-    PacientId: {
+    Patient:{
+        type: String
+    },
+    PatientId: {
         type: String
     },
 
@@ -23,10 +26,6 @@ const SeguimientoSchema= new mongoose.Schema({
 
     NextAppointment:{
         type: String
-    },
-
-    Status: {
-        type: Boolean,
     }
 });
 

@@ -9,7 +9,6 @@ import {
   Space,
   Card,
   Popconfirm,
-  message,
   Select,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, FileSearchOutlined } from "@ant-design/icons";
@@ -19,11 +18,19 @@ import "dayjs/locale/es";
 import { PacientesRepositoryImpl } from "../../domain/repositories/PacientesRepositoryImpl";
 import { PacientesUseCases } from "../../core/useCases/PacientesUseCases";
 import { certainUsers } from "../../domain/entities/MedicalUsers";
+import { SeguimientoRepositoryImpl } from "../../domain/repositories/SeguimientoRepositoryImpl";
+import { SeguimientoUseCases } from "../../core/useCases/SeguimientoUseCases";
+import { getSeguimiento, updateSeguimiento } from "../../domain/entities/Seguimiento";
 
 
 //Cargamos los datos de los usuarios con graphQL
 const pacienteRepository= new PacientesRepositoryImpl();
 const pacienteUseCases= new PacientesUseCases(pacienteRepository);
+
+
+//Importamos las funciones necesarias para consumir 
+const seguimientoRepository= new SeguimientoRepositoryImpl();
+const seguimientoUseCases= new SeguimientoUseCases(seguimientoRepository)
 
 
 const {Option}= Select;
@@ -41,33 +48,24 @@ interface Seguimiento {
 }
 
 const Seguimiento: React.FC = () => {
-  const [data, setData] = useState<Seguimiento[]>([
-    {
-      id: "1",
-      paciente: "Juan Pérez",
-      fecha: "2025-10-20",
-      motivo: "Dolor de cabeza",
-      observaciones: "Se recetó paracetamol y descanso.",
-      tratamiento: "Paracetamol 500mg cada 8h.",
-      proximaCita: "2025-11-01",
-    },
-    {
-      id: "2",
-      paciente: "María López",
-      fecha: "2025-10-22",
-      motivo: "Revisión postoperatoria",
-      observaciones: "Buena cicatrización. Sin complicaciones.",
-      tratamiento: "Continuar con antibióticos 3 días más.",
-      proximaCita: "2025-10-29",
-    },
-  ]);
+  const [data, setData] = useState<getSeguimiento[]>([]);
   const [pacientes, setPacientes]= useState<certainUsers[]>([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<Seguimiento | null>(null);
+  const [editingRecord, setEditingRecord] = useState<updateSeguimiento | null>(null);
   const [form] = Form.useForm();
 
+  //Cargamos todos los datos del catalogo
+  const fetchData= async() => {
+    try{
+      const response= await seguimientoUseCases.getSeguimiento();
+      setData(response);
+      console.log('datos de la api', response)
 
+    }catch(error){
+       console.error('Error al obtener los datos', error);
+    }
+  }
   //Cargamos los datos de los pacientes
   const fetchPatient= async() => {
      try{
@@ -81,15 +79,18 @@ const Seguimiento: React.FC = () => {
 
   useEffect(() => {
     fetchPatient();
+    fetchData();
   }, []);
 
-  const showModal = (record?: Seguimiento) => {
+  const showModal = (record?: updateSeguimiento) => {
+    console.log('record para editar', record);
     if (record) {
       setEditingRecord(record);
       form.setFieldsValue({
         ...record,
-        fecha: dayjs(record.fecha),
-        proximaCita: record.proximaCita ? dayjs(record.proximaCita) : undefined,
+        Date: dayjs(record.Date),
+        NextAppointment: record.NextAppointment ? dayjs(record.NextAppointment) : undefined,
+        
       });
     } else {
       setEditingRecord(null);
@@ -98,60 +99,69 @@ const Seguimiento: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    form.validateFields().then((values) => {
-      const newData = {
-        ...values,
-        fecha: values.fecha.format("YYYY-MM-DD"),
-        proximaCita: values.proximaCita
-          ? values.proximaCita.format("YYYY-MM-DD")
-          : undefined,
-      };
+ const handleOk = async () => {
+  try {
+    const values = await form.validateFields();
 
-      if (editingRecord) {
-        setData((prev) =>
-          prev.map((item) =>
-            item.id === editingRecord.id ? { ...item, ...newData } : item
-          )
-        );
-        message.success("Seguimiento actualizado correctamente");
-      } else {
-        setData((prev) => [...prev, { id: Date.now().toString(), ...newData }]);
-        message.success("Seguimiento agregado correctamente");
-      }
-      setIsModalVisible(false);
-    });
-  };
+    const newData = {
+      ...values,
+      Date: values.Date.format("YYYY-MM-DD"),
+      NextAppointment: values.NextAppointment
+        ? values.Date.format("YYYY-MM-DD")
+        : undefined,
+      Id: values.Id
+    };
 
-  const handleDelete = (id: string) => {
-    setData((prev) => prev.filter((item) => item.id !== id));
-    message.success("Seguimiento eliminado");
+    if (editingRecord) {
+      console.log('valores antes de enviar', newData)
+      await seguimientoUseCases.updateSeguimiento(newData);
+      fetchData();
+    } else {
+      await seguimientoUseCases.newSeguimiento(newData);
+      fetchData();
+    }
+
+    setIsModalVisible(false);
+  } catch (error) {
+    console.error(error);
+    // aquí puedes meter message.error() si usas antd
+  }
+};
+
+
+  const handleDelete = async(Id: string) => {
+    try{
+      await seguimientoUseCases.deleteSeguimiento(Id);
+      fetchData();
+    }catch(error){
+      console.error('Error al eliminar el seguimiento', error);
+    }
   };
 
   const columns = [
     {
       title: "Paciente",
-      dataIndex: "paciente",
-      key: "paciente",
+      dataIndex: "Patient",
+      key: "PatientId",
       align: "center" as const,
     },
     {
       title: "Fecha",
-      dataIndex: "fecha",
-      key: "fecha",
+      dataIndex: "Date",
+      key: "Date",
       align: "center" as const,
       render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
     },
     {
       title: "Motivo",
-      dataIndex: "motivo",
-      key: "motivo",
+      dataIndex: "Motivation",
+      key: "Motivation",
       align: "center" as const,
     },
     {
       title: "Próxima Cita",
-      dataIndex: "proximaCita",
-      key: "proximaCita",
+      dataIndex: "NextAppointment",
+      key: "NextAppointment",
       align: "center" as const,
       render: (text?: string) =>
         text ? dayjs(text).format("DD/MM/YYYY") : "—",
@@ -160,7 +170,7 @@ const Seguimiento: React.FC = () => {
       title: "Acciones",
       key: "acciones",
       align: "center" as const,
-      render: (_: any, record: Seguimiento) => (
+      render: (_: any, record: updateSeguimiento) => (
         <Space>
           <Button
             icon={<EditOutlined />}
@@ -173,7 +183,7 @@ const Seguimiento: React.FC = () => {
             title="¿Eliminar este seguimiento?"
             okText="Sí"
             cancelText="No"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.Id)}
           >
             <Button danger icon={<DeleteOutlined />}>
               Eliminar
@@ -224,6 +234,7 @@ const Seguimiento: React.FC = () => {
       >
         <Table
           columns={columns}
+          
           dataSource={data}
           rowKey="id"
           pagination={{ pageSize: 5 }}
@@ -244,7 +255,7 @@ const Seguimiento: React.FC = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             label="Paciente"
-            name="paciente"
+            name="PatientId"
             rules={[{ required: true, message: "Por favor ingresa el nombre del paciente" }]}
           >
             <Select>
@@ -261,7 +272,7 @@ const Seguimiento: React.FC = () => {
 
           <Form.Item
             label="Fecha del Seguimiento"
-            name="fecha"
+            name="Date"
             rules={[{ required: true, message: "Selecciona la fecha del seguimiento" }]}
           >
             <DatePicker style={{ width: "100%" }} />
@@ -269,22 +280,27 @@ const Seguimiento: React.FC = () => {
 
           <Form.Item
             label="Motivo o Síntoma"
-            name="motivo"
+            name="Motivation"
             rules={[{ required: true, message: "Describe el motivo de la consulta" }]}
           >
             <Input placeholder="Ej. Dolor de cabeza" />
           </Form.Item>
 
-          <Form.Item label="Observaciones / Evolución" name="observaciones">
+          <Form.Item label="Observaciones / Evolución" name="Observations">
             <Input.TextArea rows={3} placeholder="Anota observaciones médicas" />
           </Form.Item>
 
-          <Form.Item label="Tratamiento / Recomendaciones" name="tratamiento">
+          <Form.Item label="Tratamiento / Recomendaciones" name="Treathment">
             <Input.TextArea rows={2} placeholder="Ej. Paracetamol 500mg cada 8h" />
           </Form.Item>
 
-          <Form.Item label="Próxima Cita" name="proximaCita">
+          <Form.Item label="Próxima Cita" name="NextAppointment">
             <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            name="Id"
+          >
+            <Input type="hidden" />
           </Form.Item>
         </Form>
       </Modal>

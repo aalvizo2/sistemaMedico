@@ -1,7 +1,10 @@
-import React, { useEffect } from "react";
-import { Modal, Form, Input, Col, Row, DatePicker, Typography, Divider } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, Col, Row, DatePicker, Typography, Divider, Select } from "antd";
 import { SaveOutlined, UserAddOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { BloodTypeRepositoryImpl } from "../../domain/repositories/BloodTypeRepositoryImpl";
+import { BloodTypeUseCases } from "../../core/useCases/BloodTypeUseCases";
+import { getBloodType } from "../../domain/entities/BloodType";
 
 interface EditarModalProps {
     open: boolean;
@@ -10,8 +13,29 @@ interface EditarModalProps {
     datoFila: { [key: string]: any } | null;
 }
 
+const {Option}= Select;
+
+
+const bloodTypeRepository= new BloodTypeRepositoryImpl();
+const bloodTypeUseCases= new BloodTypeUseCases(bloodTypeRepository);
+
 export const EditarModal: React.FC<EditarModalProps> = ({ open, onSubmit, onCancel, datoFila }) => {
     const [form] = Form.useForm();
+    const [bloodType, setBloodType]= useState<getBloodType[]>([]);
+
+    const fetchBloodType= async() =>{
+        try{
+            const response= await bloodTypeUseCases.getBloodType();
+            setBloodType(response);
+
+        }catch(error){
+            console.error('Error al cargar los tipos de sangre', error)
+        }
+    };
+
+    useEffect(() =>{
+        fetchBloodType();
+    }, []);
 
     useEffect(() => {
         if (datoFila) {
@@ -154,6 +178,39 @@ export const EditarModal: React.FC<EditarModalProps> = ({ open, onSubmit, onCanc
                         >
                             <Input />
                         </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="BloodType"
+                      >
+                        <Select placeholder="Selecciona un Tipo de Sangre">
+                            {bloodType.map((item) => (
+                                <Option
+                                   key={item.BloodType}
+                                   value={item.BloodType}
+                                >
+                                   {item.BloodType}
+                                </Option>
+                            ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="RHFactor"
+                        
+                      >
+                        <Select placeholder="Selecciona un Factor RH">
+                            {bloodType.map((item) =>(
+                                <Option 
+                                  key={item.RHFactor}
+                                  value={item.RHFactor}
+                                >
+                                    {item.RHFactor}
+                                </Option>
+                            ))}
+                        </Select>
+                      </Form.Item>
                     </Col>
 
                     {/* Fotografía */}

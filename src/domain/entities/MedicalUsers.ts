@@ -10,6 +10,8 @@ export interface getUsers{
     ParticularPhone: string;
     CellPhone: string;
     Ocupation: string;
+    BloodType: string;
+    RHFactor: string;
     State: boolean;
     Files?: {
         Path: string;
@@ -48,6 +50,8 @@ export interface editPaciente{
     BirthPlace: string;
     Address: string;
     ParticularPhone: string;
+    BloodType: string;
+    RHFactor: string;
     CellPhone: string;
     Ocupation: string;
 }
@@ -66,6 +70,8 @@ export interface getAllDeletedUsers{
     BirthPlace: string;
     Address: string;
     ParticularPhone: string;
+    BloodType: string;
+    RHFactor: string;
     CellPhone: string;
     Ocupation: string;
     State: boolean;

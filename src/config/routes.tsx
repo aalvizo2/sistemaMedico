@@ -109,7 +109,12 @@ const AppRoutes: React.FC = () => {
 
       <Route 
         path="perfil"
-        element={<Perfil />}
+        element={
+         isAuthenticated ?
+           <Perfil />: (
+            <Navigate to="/" />
+         )
+       }
       />
     </Routes>
   );

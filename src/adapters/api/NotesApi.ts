@@ -79,6 +79,9 @@ export const NotesApi = {
 
     console.log('variables antes de enviar', variables)
     const response = await httpClient.post("", { query: mutation, variables });
+    if(response){
+      message.success('Operación realizada con éxito');
+    }
     return response.data.data.updateNote;
   },
   deleteNote: async (id: string): Promise<deleteNote> => {
@@ -98,7 +101,7 @@ export const NotesApi = {
     });
 
     if (response) {
-      message.success('Nota eliminada correctamente');
+      message.success('Operación realizada con éxito');
     }
 
     return response.data.data.deleteNote;

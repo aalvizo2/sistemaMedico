@@ -29,7 +29,7 @@ export const resolvers = {
       });
 
       console.log('datos antes de guardar', newNote)
-
+ 
       return await newNote.save();
     },
     updateNote: async (_, { id, input }) => {

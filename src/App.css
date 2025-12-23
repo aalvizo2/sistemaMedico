@@ -9,7 +9,7 @@
 html, body {
   width: 100%;
   height: 100%;
-  font-family: "Poppins", sans-serif; /* Aplica la fuente globalmente */
+  font-family: "Poppins", sans-serif; 
 }
 
 #root {

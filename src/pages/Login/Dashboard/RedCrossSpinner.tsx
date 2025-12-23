@@ -11,16 +11,18 @@ const RedCrossSpinner: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 20px;
-          position: absolute;
+          position: fixed;
           top: 50%;
           left: 50%;
-          
+          transform: translate(-50%, -50%);
+          z-index: 9999;
         }
 
         .red-cross-spinner {
           position: relative;
           width: 40px;
           height: 40px;
+          flex-shrink: 0;
           animation: pulse 1s ease-in-out infinite;
         }
 
@@ -49,8 +51,20 @@ const RedCrossSpinner: React.FC = () => {
         }
 
         .spinner-text {
-          
+          font-size: 14px;
+          white-space: nowrap;
           animation: ambulance-blink 1s infinite;
+        }
+
+        /* 🔥 Responsive: en pantallas pequeñas solo la cruz */
+        @media (max-width: 480px) {
+          .spinner-text {
+            display: none;
+          }
+
+          .objetos {
+            gap: 0;
+          }
         }
 
         @keyframes pulse {
@@ -78,4 +92,3 @@ const RedCrossSpinner: React.FC = () => {
 };
 
 export default RedCrossSpinner;
-

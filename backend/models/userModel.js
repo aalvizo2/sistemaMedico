@@ -49,6 +49,9 @@ const UserSchema = new mongoose.Schema({
     BloodType: {
         type: String
     },
+    RHFactor:{
+       type: String,
+    },
     Files: [
         {
             Path: String,

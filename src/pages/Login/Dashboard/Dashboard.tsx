@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 import image from '../../../../public/images/image.webp';
 // import { Select } from 'antd';
-
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { usePacienteContext } from '../../../context/DashboardContext';
 import moment from 'moment';
 // import { HistorialClinicoUseCases } from '../../../core/useCases/HistorialClinicoUseCases';
@@ -12,10 +12,22 @@ import RedCrossSpinner from './RedCrossSpinner';
 
 import { NotesRepositoryImpl } from '../../../domain/repositories/NotesRepositoryImpl';
 import { NotesUseCases } from '../../../core/useCases/NotesUseCases';
-import { getNotes } from '../../../domain/entities/Notes';
+import { getNotes, newEditNote } from '../../../domain/entities/Notes';
+import { EditNoteModal, NewNoteModal } from './NotasModal';
+import { Popconfirm } from 'antd';
+import { getSeguimiento, newSeguimiento, updateSeguimiento } from '../../../domain/entities/Seguimiento';
+import { SeguimientoRepositoryImpl } from '../../../domain/repositories/SeguimientoRepositoryImpl';
+import { SeguimientoUseCases } from '../../../core/useCases/SeguimientoUseCases';
+import { EditSeguimientoModal, NewSeguimientoModal } from './SeguimientoModal';
 
-const notesRepository= new NotesRepositoryImpl();
-const notesUseCases= new NotesUseCases(notesRepository);
+
+
+
+const notesRepository = new NotesRepositoryImpl();
+const notesUseCases = new NotesUseCases(notesRepository);
+
+const seguimientoRepository = new SeguimientoRepositoryImpl();
+const seguimientoUseCases = new SeguimientoUseCases(seguimientoRepository);
 
 
 // const historialRepository = new HistorialMedicoRepositoryImpl();
@@ -26,48 +38,40 @@ const notesUseCases= new NotesUseCases(notesRepository);
 const Dashboard: React.FC = () => {
 
   const { paciente, loading } = usePacienteContext();
+  //gestionamos los modales de notas
+  const [notasModal, setNotasModal] = useState(false);
+  const [editarNotaModal, setEditarNotaModal] = useState(false);
+  const [datoFila, setDatoFila] = useState<getNotes | null>(null);
+  const [seguimiento, setSeguimiento] = useState<getSeguimiento[]>([]);
+  const [seguimientoModal, setSeguimientoModal] = useState(false);
+  const [editSeguimientoModal, setEditSeguimientoModal] = useState(false);
+  const [seguimientoDatoFila, setSeguimientoDatoFila] = useState<getSeguimiento | null>(null);
+  //Creamos una funcion para los modales de notas medicas
+  const toggleNotasModal = () => {
+    setNotasModal(true);
+  };
 
-  //Agrego unos json temporales para seguimiento
-  const seguimiento = [
-    {
-      id: "1",
-      paciente: "Juan Pérez",
-      fecha: "2025-10-20",
-      motivo: "Dolor de cabeza",
-      observaciones: "Se recetó paracetamol y descanso.",
-      tratamiento: "Paracetamol 500mg cada 8h.",
-      proximaCita: "2025-11-01",
-    },
-    {
-      id: "2",
-      paciente: "María López",
-      fecha: "2025-10-22",
-      motivo: "Revisión postoperatoria",
-      observaciones: "Buena cicatrización. Sin complicaciones.",
-      tratamiento: "Continuar con antibióticos 3 días más.",
-      proximaCita: "2025-10-29",
-    },
-  ];
+  const handleEditNote = (record: getNotes) => {
+    setDatoFila(record);
+    setEditarNotaModal(true);
+  };
 
-  // const notas = [
-  //   {
-  //     id: "1",
-  //     paciente: "Juan Pérez",
-  //     fecha: "2025-10-20",
-  //     medico: "Dra. María Gómez",
-  //     tipoNota: "Evolución",
-  //     descripcion: "Paciente presenta mejoría, sin fiebre. Se mantiene tratamiento actual.",
-  //   },
-  //   {
-  //     id: "2",
-  //     paciente: "Ana Rodríguez",
-  //     fecha: "2025-10-25",
-  //     medico: "Dr. Luis Herrera",
-  //     tipoNota: "Ingreso",
-  //     descripcion: "Ingreso por dolor abdominal. Se ordenan análisis de laboratorio.",
-  //   },
-  // ]
+  const seguimientoModalToggle = () => {
+    setSeguimientoModal(true);
+  };
+
+  const handleToggleEditSeguimiento = (record: getSeguimiento) =>{
+    setSeguimientoDatoFila(record);
+    setEditSeguimientoModal(true);
+  };
+
+
+
+
   const [notas, setNotas] = useState<getNotes[]>([]);
+
+
+
 
   const formatPhoneNumber = (phone: string): string => {
     if (!phone) return '';
@@ -76,43 +80,106 @@ const Dashboard: React.FC = () => {
     return match ? `${match[1]}-${match[2]}-${match[3]}` : phone; // Formatear
   };
 
-  // const fetchHistorial = async (userId: string) => {
-  //   setLoading(true);
-
-  //   // función delay con promesa
-  //   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  //   try {
-  //     await delay(3000); // espera 3 segundos
-
-  //     const response = await historialUseCases.getHistorial(userId);
-  //     console.log(response);
-
-  //   } catch (error) {
-  //     console.error('Error al cargar los datos', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
 
 
-  const fetchNotes= async(patientId: string)=>{
-    try{
-      const response= await notesUseCases.getNotesByPatient(patientId);
+  const fetchNotes = async (patientId: string) => {
+    try {
+      const response = await notesUseCases.getNotesByPatient(patientId);
       console.log('notas obtenidas', response);
       setNotas(response);
-    }catch(error){
+    } catch (error) {
       console.error("Error al obtener las notas", error);
 
     }
   };
 
-  useEffect(()=>{
-    if(paciente){
-      fetchNotes(paciente.Id);
+  const fetchSeguimiento = async (patientId: string) => {
+    try {
+      const response = await seguimientoUseCases.getSeguimientoByPatientId(patientId);
+      console.log("seguimiento obtenido", response);
+      setSeguimiento(response);
+
+    } catch (error) {
+      console.error("Error al obtener el seguimiento", error);
     }
-  },[paciente])
+  }
+
+  useEffect(() => {
+    if (paciente) {
+      fetchNotes(paciente.Id);
+      fetchSeguimiento(paciente.Id);
+    }
+  }, [paciente]);
+
+  const handleNewNote = async (values: newEditNote) => {
+    try {
+      await notesUseCases.newNote(values);
+      if (paciente) {
+        fetchNotes(paciente.Id);
+      }
+
+    } catch (error) {
+      console.error("Error al crear una nueva nota", error)
+    };
+  };
+
+  const handleSubmitEditNote = async (newData: getNotes) => {
+    try {
+      await notesUseCases.editNote(newData);
+      if (paciente) {
+        fetchNotes(paciente.Id);
+      }
+    } catch (error) {
+      console.error('Error al editar la nota', error);
+    }
+  };
+
+  const handleDeleteNote = async (Id: string) => {
+
+    try {
+      await notesUseCases.deleteNote(Id);
+      if (paciente) {
+        fetchNotes(paciente.Id);
+      }
+    } catch (error) {
+      console.error('Error al eliminar la nota', error);
+    }
+  };
+
+  const handleSaveSeguimiento= async(newData: newSeguimiento) =>{
+    try{
+      await seguimientoUseCases.newSeguimiento(newData);
+      if(paciente){
+        fetchSeguimiento(paciente.Id);
+      }
+    }catch(error){
+      console.error('Error al guardar el seguimiento', error);
+    }
+  };
+
+  const handleEditSeguimiento = async(newData: updateSeguimiento) =>{
+    try{
+       await seguimientoUseCases.updateSeguimiento(newData);
+       if(paciente){
+        fetchSeguimiento(paciente.Id);
+       }
+    }catch(error){
+      console.error('Error al editar el seguimiento', error);
+    }
+  };
+
+  const handleDeleteSeguimiento = async(Id: string) =>{
+    try{
+      await seguimientoUseCases.deleteSeguimiento(Id);
+      if(paciente){
+        fetchSeguimiento(paciente.Id);
+      }
+
+    }catch(error){
+      console.error('Error al eliminar el seguimiento', error);
+    }
+  }
   return (
     <>
 
@@ -201,10 +268,10 @@ const Dashboard: React.FC = () => {
                   <span>Ocupación: </span> {paciente.Ocupation}
                 </div>
                 <div className="column">
-                  <span>Grupo Sanguíneo:</span> A
+                  <span>Grupo Sanguíneo:</span> {paciente.BloodType}
                 </div>
                 <div className="column">
-                  <span>Factor RH:</span> +
+                  <span>Factor RH:</span> {paciente.RHFactor}
                 </div>
               </div>
 
@@ -221,22 +288,45 @@ const Dashboard: React.FC = () => {
                     <div className="section">
                       <div className="section-header">
                         <span className="section-title">Notas Médicas</span>
-                        <button className="btn-agregar">Agregar Nota</button>
+                        <button className="btn-agregar" onClick={toggleNotasModal}><PlusOutlined /> Nuevo</button>
                       </div>
+                      {notas.length > 0 ? (
+                        <div className="grid-3">
+                          {notas.map(item => (
+                            <div key={item.id} className="item">
+                              <div><span>Fecha:</span> <p>{item.Date}</p></div>
+                              <div><span>Tipo:</span> <p>{item.NoteType}</p></div>
+                              <div><span>Médico:</span> <p>{item.Doctor}</p></div>
+                              <div><span>Descripción:</span><p>{item.Description}</p> </div>
+                              <button
+                                className="btn-editar"
+                                onClick={() => handleEditNote(item)}
+                              >
+                                <span className='btn-editar-text'><EditOutlined />Editar</span> 
+                              
+                              </button>
+                              <Popconfirm
+                                title="Eliminar nota"
+                                description="¿Estás seguro de que deseas eliminar esta nota? Esta acción no se puede deshacer."
+                                okText="Sí"
+                                cancelText="No"
+                                onConfirm={() => handleDeleteNote(item.id)}
+                              >
+                                <button className="btn-eliminar">
+                                  <span><DeleteOutlined /> Eliminar</span>
+                                </button>
+                              </Popconfirm>
 
-                      <div className="grid-3">
-                        {notas.map(item => (
-                          <div key={item.id} className="item">
-                            <div><span>Fecha:</span> {item.Date}</div>
-                            <div><span>Tipo:</span> {item.NoteType}</div>
-                            <div><span>Médico:</span> {item.Doctor}</div>
-                            <div><span>Descripción:</span>{item.Description} </div>
-                            <button className="btn-editar">Editar</button>
-                          </div>
-                        ))}
+                            </div>
+                          ))}
 
 
-                      </div>
+                        </div>
+
+                      ) : (
+                        <div className='empty-text-cards'>No hay datos disponibles</div>
+                      )}
+
 
                     </div>
 
@@ -244,25 +334,46 @@ const Dashboard: React.FC = () => {
                     <div className="section">
                       <div className="section-header">
                         <span className="section-title">Seguimiento / Tratamientos</span>
-                        <button className="btn-agregar">Agregar Seguimiento</button>
+                        <button className="btn-agregar" onClick={seguimientoModalToggle}><PlusOutlined /> Nuevo</button>
                       </div>
+                      {seguimiento.length > 0 ? (
+                        <div className="grid-3">
+                          {seguimiento.map((item) => (
+                            <div key={item.Id} className="item">
+                              <div><span>Fecha:</span> <p>{moment(item.Date).format("DD/MM/YYYY")}</p></div>
+                              <div><span>Motivo:</span> <p>{item.Motivation}</p></div>
+                              <div><span>Observaciones:</span> <p>{item.Observations}</p></div>
+                              <div><span>Tratamiento:</span> <p>{item.Treathment}</p></div>
+                              <div><span>Próxima cita:</span> <p>{moment(item.NextAppointment).format("DD/MM/YYYY")}</p></div>
+                              <button 
+                                 className="btn-editar" 
+                                 onClick={() => handleToggleEditSeguimiento(item)}
+                              >
+                                <span><EditOutlined /> Editar</span>
+                              </button>
+                              <Popconfirm
+                                title="Eliminar seguimiento"
+                                description="¿Estás seguro de que deseas eliminar este seguimiento? Esta acción no se puede deshacer."
+                                okText="Sí"
+                                cancelText="No"
+                                onConfirm={() => handleDeleteSeguimiento(item.Id)}
+                              >
+                                <button className="btn-eliminar">
+                                  <span><DeleteOutlined /> Eliminar</span>
+                                </button>
+                              </Popconfirm>
+                            </div>
+                          ))}
+
+
+                        </div>
+                      ) : (
+                        <div className='empty-text-cards'>No hay datos disponibles</div>
+                      )}
 
 
 
-                      <div className="grid-3">
-                        {seguimiento.map((item) => (
-                          <div key={item.id} className="item">
-                            <div><span>Fecha:</span> {moment(item.fecha).format("DD/MM/YYYY")}</div>
-                            <div><span>Motivo:</span> {item.motivo}</div>
-                            <div><span>Observaciones:</span> {item.observaciones}</div>
-                            <div><span>Tratamiento:</span> {item.tratamiento}</div>
-                            <div><span>Próxima cita:</span> {moment(item.proximaCita).format("DD/MM/YYYY")}</div>
-                            <button className="btn-editar">Editar</button>
-                          </div>
-                        ))}
 
-
-                      </div>
 
                     </div>
 
@@ -298,6 +409,34 @@ const Dashboard: React.FC = () => {
 
 
       </div>
+      <NewNoteModal
+        open={notasModal}
+
+        paciente={paciente}
+        onClose={() => setNotasModal(false)}
+        onSubmit={handleNewNote}
+      />
+
+      <EditNoteModal
+        open={editarNotaModal}
+        onClose={() => setEditarNotaModal(false)}
+        datoFila={datoFila}
+        onSubmit={handleSubmitEditNote}
+      />
+
+      <NewSeguimientoModal
+        open={seguimientoModal}
+        onClose={() => setSeguimientoModal(false)}
+        onSave={handleSaveSeguimiento}
+        paciente={paciente}
+      />
+
+      <EditSeguimientoModal
+        open={editSeguimientoModal}
+        onCancel={() => setEditSeguimientoModal(false)}
+        datoFila={seguimientoDatoFila}
+        onSave={handleEditSeguimiento}
+      />
     </>
   );
 };

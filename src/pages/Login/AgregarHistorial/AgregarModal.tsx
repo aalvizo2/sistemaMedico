@@ -1,7 +1,10 @@
-import React from "react";
-import { Modal, Form, Input, Col, Row, DatePicker, Upload, Typography, Divider } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, Col, Row, DatePicker, Upload, Typography, Divider, Select } from "antd";
 import { SaveOutlined, UploadOutlined, UserAddOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { BloodTypeRepositoryImpl } from "../../../domain/repositories/BloodTypeRepositoryImpl";
+import { BloodTypeUseCases } from "../../../core/useCases/BloodTypeUseCases";
+import { getBloodType } from "../../../domain/entities/BloodType";
 
 interface AgregarModalProps {
   open: boolean;
@@ -9,8 +12,14 @@ interface AgregarModalProps {
   onCancel: () => void;
 }
 
+const { Option } = Select;
+
+const bloodTypesRepository = new BloodTypeRepositoryImpl();
+const bloodTypesUseCases = new BloodTypeUseCases(bloodTypesRepository)
+
 export const AgregarModal: React.FC<AgregarModalProps> = ({ open, onSubmit, onCancel }) => {
   const [form] = Form.useForm();
+  const [bloodTypes, setBloodTypes] = useState<getBloodType[]>([])
 
   // Calcular edad al seleccionar la fecha
   const handleBirthdayChange = (date: any) => {
@@ -30,6 +39,20 @@ export const AgregarModal: React.FC<AgregarModalProps> = ({ open, onSubmit, onCa
       onCancel();
     });
   };
+
+  const fetchBloodTypes = async () => {
+    try {
+      const response = await bloodTypesUseCases.getBloodType();
+      setBloodTypes(response);
+
+    } catch (error) {
+      console.error("Error al obtener los tipos de sangre:", error)
+    }
+  };
+
+  useEffect(() => {
+    fetchBloodTypes();
+  }, []);
 
   return (
     <Modal
@@ -149,6 +172,46 @@ export const AgregarModal: React.FC<AgregarModalProps> = ({ open, onSubmit, onCa
               rules={[{ required: true, message: "Por favor ingrese la ocupación" }]}
             >
               <Input placeholder="Ej. Ingeniero en Sistemas" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Tipo de Sangre"
+              name="BloodType"
+
+            >
+              <Select
+                placeholder="Selecciona un Tipo de Sangre"
+              >
+                {bloodTypes.map((item) => (
+                  <Option
+                    key={item.BloodType}
+                    value={item.BloodType}
+                  >
+                    {item.BloodType}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Factor RH"
+              name="RHFactor"
+            >
+              <Select
+                placeholder="Selecciona un Factor RH"
+              >
+                {bloodTypes.map((item) => (
+                  <Option
+                    key={item.RHFactor}
+                    value={item.RHFactor}
+                  >
+                    {item.RHFactor}
+                  </Option>
+                ))}
+              </Select>
+
             </Form.Item>
           </Col>
 

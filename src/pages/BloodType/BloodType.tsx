@@ -34,7 +34,7 @@ const BloodType: React.FC = () => {
         const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
         setLoading(true)
         try {
-            await delay(3000);
+            delay(2000);
             const response = await bloodTypeUseCases.getBloodType();
             setData(response);
         } catch (error) {
@@ -219,11 +219,11 @@ const BloodType: React.FC = () => {
                     <Form.Item
                         label="Factor RH"
                         name="RHFactor"
-                        rules={[{ required: true, message: "Por favor selecciona el factor RH" }]}
+                        rules={[{ required: false, message: "Por favor selecciona el factor RH" }]}
                     >
                         <Select placeholder="Selecciona el factor RH">
-                            <Option value="+">+</Option>
-                            <Option value="-">-</Option>
+                            <Option value="Positivo">+</Option>
+                            <Option value="Negativo">-</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item name="Id" hidden>
